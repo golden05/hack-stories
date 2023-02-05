@@ -1,34 +1,89 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import './App.css'
+import * as React from "react";
 
-function App() {
-  const [count, setCount] = useState(0)
-
+function Item(props) {
   return (
-    <div className="App">
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src="/vite.svg" className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://reactjs.org" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </div>
-  )
+    <li key={props.item.objectID}>
+      <span>
+        <a href={props.item.url}>{props.item.title}</a>
+      </span>
+      <span>{props.item.author}</span>
+      <span>{props.item.num_comments}</span>
+      <span>{props.item.points}</span>
+    </li>
+  );
 }
 
-export default App
+function List(props) {
+  return (
+    <ul>
+      {props.list.map(function(item) {
+        return <Item item={item} />;
+      })}
+    </ul>
+  );
+}
+
+function Search(props) {
+  const [searchTerm, setSearchTerm] = React.useState("");
+
+  const handleChange = event => {
+    setSearchTerm(event.target.value);
+    props.onSearch(event);
+  };
+
+  return (
+    <div>
+      <label htmlFor="search">Search: </label>
+      <input id="input" type="text" onChange={props.onSearch} />
+
+      <p>
+        Searching for <strong>{searchTerm}</strong>
+      </p>
+    </div>
+  );
+}
+
+function App() {
+  const stories = [
+    {
+      title: "React",
+      url: "https://reactjs.org",
+      author: "Jordan Walke",
+      num_comments: 3,
+      points: 4,
+      objectID: 0
+    },
+    {
+      title: "Redux",
+      url: "https://redux.js.org",
+      author: "Dan Abramov, Andrew Clark",
+      num_comments: 2,
+      points: 5,
+      objectID: 1
+    }
+  ];
+
+  const [searchTerm, setSearchTerm] = React.useState("");
+
+  const handleSearch = event => {
+    setSearchTerm(event.target.value);
+  };
+
+  const searchedStories = stories.filter(function(story) {
+    return story.title.toLowerCase().includes(searchTerm.toLowerCase());
+  });
+
+  return (
+    <div>
+      <h1>My Hackr Stories</h1>
+
+      <Search onSearch={handleSearch} />
+
+      <hr />
+
+      <List list={searchedStories} />
+    </div>
+  );
+}
+
+export default App;
